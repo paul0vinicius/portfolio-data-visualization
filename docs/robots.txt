@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://paul0vinicius.github.io//sitemap.xml
+Sitemap: https://paul0vinicius.github.io/portfolio-data-visualization//sitemap.xml
