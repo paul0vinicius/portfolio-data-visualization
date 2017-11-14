@@ -1,4 +1,4 @@
-baseurl = "http://example.org"
+baseurl = "https://paul0vinicius.github.io/portfolio-data-visualization/"
 title = "Dimension"
 theme = "dimension"
 languageCode = "en-us"
