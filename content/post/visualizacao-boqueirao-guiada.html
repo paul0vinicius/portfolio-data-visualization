@@ -1,0 +1,146 @@
+---
+title: "Visualização Boqueirão 2.0"
+date: 2017-11-29T20:30:06-03:00
+draft: false
+---
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <h2>Dados de Boqueirão: Meses chuvosos</h2>
+    </div>
+    <div class="row mychart" id="chart">
+    </div>
+    <div>
+      <p>
+        Olá! essa é minha segunda visualização feita utilizando D3.
+        Acima nós temos dados sobre o açude Epitássio Pessoa (Boqueirão)
+        ao longo do ano.
+      </p>
+      <p>
+        A cor azul representa os meses chuvosos (entre Janeiro e Abril),
+        enquanto a cor vermelha representa os meses de "seca".
+      </p>
+    </div>
+  </div>
+
+  <style>
+    .mychart rect {
+      fill: steelblue;
+    }
+
+    .mychart rect:hover {
+      fill: goldenrod;
+    }
+
+    .mychart text {
+      font: 12px sans-serif;
+      text-anchor: left;
+    }
+  </style>
+
+  <script type="text/javascript">
+    "use strict"
+
+    function desenhaBarras(dados) {
+      // definicoes de altura e largura do svg e da vis dentro
+      var alturaSVG = 400, larguraSVG = 600;
+      var	margin = {top: 10, right: 20, bottom:30, left: 45}, // para descolar a vis das bordas do grafico
+          larguraVis = larguraSVG - margin.left - margin.right,
+          alturaVis = alturaSVG - margin.top - margin.bottom;
+
+      /*
+       * Prepara onde adicionaremos a visualizacao
+       */
+      var grafico = d3.select('#chart') // cria elemento <svg> com um <g> dentro
+        .append('svg')
+          .attr('width', larguraVis + margin.left + margin.right)
+          .attr('height', alturaVis + margin.top + margin.bottom)
+        .append('g') // para entender o <g> vá em x03-detalhes-svg.html
+          .attr('transform', 'translate(' +  margin.left + ',' + margin.top + ')');
+
+      // === EDITE DAQUI ===
+      /*
+       * As escalas
+       */
+
+      // Configure essa escala com domain, range e padding
+      var x = d3.scaleLinear()
+                .domain([88, 103])
+                .rangeRound([0,larguraVis]);
+
+      // Configure essa escala com domain e range
+      // Lembre que uma escala pode converter de 1..10 -> 100..1
+      var y = d3.scaleLinear()
+                .domain([0, 28])
+                .rangeRound([alturaVis, 0]);
+
+      // === ATÉ DAQUI ===
+
+      /*
+       * As marcas
+       */
+      grafico.selectAll('g')
+              .data(dados)
+              .enter()
+                .append('circle')
+                  .attr('cx', d => x(d.noventa_percentil))   // usando a escala definida acima
+                  .attr('r', d => 5) // largura da barra via escala
+                  .attr('cy', d => y(d.dez_percentil))
+                  .attr('fill', d => mes_chuvoso(d));
+
+
+      /*
+       * Os eixos
+       */
+      grafico.append("g")
+              .attr("class", "x axis")
+              .attr("transform", "translate(0," + alturaVis + ")")
+              .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+
+      grafico.append('g')
+              .attr('transform', 'translate(0,0)')
+              .call(d3.axisLeft(y))  // gera eixo a partir da escala
+
+      grafico.append("text")
+        .attr("transform", "translate(-30," + (alturaVis + margin.top)/2 + ") rotate(-90)")
+        .text("Dez percentil");
+
+
+      grafico.append("text")
+        .attr("transform", "translate(" +(larguraVis + margin.top)/2 + "," + (alturaVis + margin.bottom)  + ")")
+        .text("Noventa-Percentil");
+    }
+
+
+    function mes_chuvoso(dados) {
+      if(dados.mes < 5){
+        return "BLUE";
+      }
+      else{
+        return "RED";
+      }
+
+    };
+
+      d3.json('https://raw.githubusercontent.com/dandaramcsousa/intro-d3-1/master/dados/boqueirao-por-mes.json', function(dados) {
+      desenhaBarras(dados);
+    });
+
+    /*
+    * Assim como a função d3.tsv, existe a d3.csv e a d3.json
+    * Em todas, o primeiro parâmetro é uma URL e o segundo a função que
+    * será executada quando o dado for obtido.
+    * >>>>> A chamada ao d3.tsv é assíncrona <<<<<<
+    */
+  </script>
+</body>
+
+</html>
