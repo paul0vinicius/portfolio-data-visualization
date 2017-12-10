@@ -1,0 +1,62 @@
+{
+  "_from": "radar-chart-d3",
+  "_id": "radar-chart-d3@1.2.0",
+  "_inBundle": false,
+  "_integrity": "sha1-Paa9UVTshqzaEaM5+fAVEA23r9o=",
+  "_location": "/radar-chart-d3",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "radar-chart-d3",
+    "name": "radar-chart-d3",
+    "escapedName": "radar-chart-d3",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/radar-chart-d3/-/radar-chart-d3-1.2.0.tgz",
+  "_shasum": "3da6bd5154ec86acda11a339f9f015100db7afda",
+  "_spec": "radar-chart-d3",
+  "_where": "/home/paul0vinicius/Documentos/data-visualization/lab02",
+  "author": {
+    "name": "Alvaro Graves",
+    "email": "alvaro@graves.cl",
+    "url": "http://graves.cl"
+  },
+  "bugs": {
+    "url": "https://github.com/alangrafu/radar-chart-d3/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "d3": "~3.5.5"
+  },
+  "deprecated": false,
+  "description": "Radar chart based on D3",
+  "directories": {
+    "example": "example"
+  },
+  "homepage": "https://github.com/alangrafu/radar-chart-d3#readme",
+  "keywords": [
+    "d3",
+    "radar",
+    "radar-chart",
+    "visualization"
+  ],
+  "license": "Apache-2.0",
+  "main": "src/radar-chart.js",
+  "name": "radar-chart-d3",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alangrafu/radar-chart-d3.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "style": "src/radar-chart.css",
+  "version": "1.2.0"
+}
