@@ -56,7 +56,7 @@
 
   <head>
     <meta charset="utf-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     <script src="libraries/radar-chart-d3/src/radar-chart.js"></script>
   </head>
 
@@ -279,6 +279,7 @@
 
 <head>
   <meta charset="utf-8">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 </head>
 
 <body>
@@ -342,13 +343,13 @@
        */
 
       // Configure essa escala com domain, range e padding
-      var x = d3.scaleLinear()
+      var x = d3.scale.linear()
                 .domain([88, 103])
                 .rangeRound([0,larguraVis]);
 
       // Configure essa escala com domain e range
       // Lembre que uma escala pode converter de 1..10 -> 100..1
-      var y = d3.scaleLinear()
+      var y = d3.scale.linear()
                 .domain([0, 28])
                 .rangeRound([alturaVis, 0]);
 
@@ -373,11 +374,11 @@
       grafico.append("g")
               .attr("class", "x axis")
               .attr("transform", "translate(0," + alturaVis + ")")
-              .call(d3.axisBottom(x)); // magica do d3: gera eixo a partir da escala
+              .call(d3.svg.axis().scale(x).orient("bottom")); // magica do d3: gera eixo a partir da escala
 
       grafico.append('g')
               .attr('transform', 'translate(0,0)')
-              .call(d3.axisLeft(y))  // gera eixo a partir da escala
+              .call(d3.svg.axis().scale(y).orient("left"));  // gera eixo a partir da escala
 
       grafico.append("text")
         .attr("transform", "translate(-30," + (alturaVis + margin.top)/2 + ") rotate(-90)")
