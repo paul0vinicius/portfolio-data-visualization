@@ -8,7 +8,7 @@ draft: false
 
   <head>
     <meta charset="utf-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
     <script src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
     <script src="libraries/radar-chart-d3/src/radar-chart.js"></script>
@@ -56,342 +56,64 @@ draft: false
       <div class="carros-motos-container" id="carros-motos-container"></div>
 
       <style>
-        .carros-motos-container.axis path,
-        .carros-motos-container.axis line {
-          fill: none;
-          stroke: #ddd;
-          shape-rendering: crispEdges;
-        }
 
-        .carros-motos-container.x.axis path {
-          //fill: #ddd;
-          stroke: #ddd;
-        }
+      .arc text {
+        font: 10px sans-serif;
+        text-anchor: middle;
+      }
 
-        .carros-motos-container.tick {
-        fill: #999;
-          }
+      .arc path {
+        stroke: #fff;
+      }
 
-        .carros-motos-container.line {
-          fill: none;
-          stroke: steelblue;
-          stroke-width: 1px;
-        }
-
-        .carros-motos-container.selectedline {
-          fill: none;
-          stroke: steelblue;
-          stroke-width: 8px;
-        }
-
-         .carros-motos-container.lineSelected {
-
-         }
-
-        .carros-motos-containercircle {
-          pointer-events: all;
-          cursor: points;
-        }
-
-        .carros-motos-container.d3-tip {
-          line-height: 1;
-          font-weight: bold;
-          padding: 12px;
-          background: rgba(0, 0, 0, 0.8);
-          color: #fff;
-          border-radius: 2px;
-        }
-
-        /* Creates a small triangle extender for the tooltip */
-        .carros-motos-container.d3-tip:after {
-          box-sizing: border-box;
-          display: inline;
-          font-size: 10px;
-          width: 100%;
-          line-height: 1;
-          color: rgba(0, 0, 0, 0.8);
-          content: "\25BC";
-          position: absolute;
-          text-align: center;
-        }
-
-        /* Style northward tooltips differently */
-        .carros-motos-container.d3-tip.n:after {
-          margin: -1px 0 0 0;
-          top: 100%;
-          left: 0;
-        }
       </style>
 
       <script>
-        var margin = {top: 20, right: 80, bottom: 30, left: 50},
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
 
-        var parseDate = d3.time.format("%Y%m%d").parse;
+      var width = 960,
+          height = 500,
+          radius = Math.min(width, height) / 2;
+
+      var color = d3.scale.ordinal()
+          .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+      var arc = d3.svg.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(radius - 70);
+
+      var pie = d3.layout.pie()
+          .sort(null)
+          .value(function(d) { return d.quant_veiculos; });
+
+      var svg = d3.select("#carros-motos-container").append("svg")
+          .attr("width", width)
+          .attr("height", height)
+        .append("g")
+          .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+      d3.csv("data/pie_chart.csv", type, function(error, data) {
+        if (error) throw error;
+
+        var g = svg.selectAll(".arc")
+            .data(pie(data))
+          .enter().append("g")
+            .attr("class", "arc");
+
+        g.append("path")
+            .attr("d", arc)
+            .style("fill", function(d) { return color(d.data.veiculos); });
+
+        g.append("text")
+            .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+            .attr("dy", ".35em")
+            .text(function(d) { return d.data.veiculos; });
+      });
+
+      function type(d) {
+        d.quant_veiculos = +d.quant_veiculos;
+        return d;
+      }
 
-        var x = d3.time.scale()
-            .range([0, width]);
-
-        var y = d3.scale.linear()
-            .range([height, 0]);
-
-        var color = d3.scale.category10();
-
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom");
-
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
-
-        var line = d3.svg.line()
-            .interpolate("cardinal")
-            .x(function(d) { return x(d.date); })
-            .y(function(d) { return y(d.value); });
-
-        var tip = d3.tip()
-          .attr('class', 'd3-tip')
-          .offset([-10, 0])
-          .html(function(d) {
-            return "<strong>Frequency:</strong> <span style='color:pink'>" + d.value + "</span>";
-          })
-
-        var reorder = function(){
-          // make sure the selected line is on top...
-          // with D3 v3, ordering  is easiser with jquery but v4 has better ordering
-
-          var selectedLineGroup = $(".lineSelected");
-          selectedLineGroup.remove();
-
-          // add it back first
-          $('#chart').append(selectedLineGroup);
-        }
-
-        var getLineColor = function(d){
-           return ( d.selected ) ? "pink" : "lightgrey";
-        }
-
-        var getLineWidth = function(d){
-           return ( d.selected ) ? "4px" : "1px";
-        }
-
-        var getCityClass = function(d){
-           return ( d.selected ) ? "city lineSelected" : "city";
-        }
-
-        var svg = d3.select("carros-motos-container").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-          .append("g")
-            .attr("id","chart")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-
-
-        var tabProcessData = function(data){
-
-            color.domain(d3.keys(data[0]).filter(function(key) { return key !== "date"; }));
-
-          data.forEach(function(d) {
-            d.date = parseDate(d.date);
-          });
-
-          return data;
-        }
-
-        var createCitiesData = function(data){
-          return color.domain().map(function(name) {
-
-            let bSelected = (name === "San Francisco") ? true : false;
-
-            return {
-              name: name,
-              values: data.map(function(d) {
-                return {date: d.date, value: +d[name], selected: bSelected};
-              }),
-              selected: bSelected,
-            };
-          });
-        }
-
-        var createChart = function(data){
-
-          var cities = createCitiesData(data);
-
-          x.domain(d3.extent(data, function(d) { return d.date; }));
-
-          y.domain([
-            d3.min(cities, function(c) { return d3.min(c.values, function(v) { return v.value; }); }),
-            d3.max(cities, function(c) { return d3.max(c.values, function(v) { return v.value; }); })
-          ]);
-
-          svg.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(xAxis);
-
-          svg.append("g")
-              .attr("class", "y axis")
-              .call(yAxis)
-            .append("text")
-              .attr("transform", "rotate(-90)")
-              .attr("y", 6)
-              .attr("dy", ".71em")
-              .style("text-anchor", "end")
-              .text(""); // obviously a value - label isn't necessary
-
-
-
-          var city = svg.selectAll(".city")
-              .data(cities)
-            .enter().append("g")
-              .attr("class", "city");
-
-          let path = city.append("path")
-              .attr("class", "line")
-              .attr("d", function(d) { return line(d.values); })
-              .style("stroke", function(d) { return getLineColor(d) })
-              .style("stroke-width", function(d) { return getLineWidth(d) });
-
-          var totalLength = 5;
-
-          let onUpdate = function(){
-
-          };
-
-          let pathLengths = [];
-
-          path.each( function() {
-        		var len = d3.select(this).node().getTotalLength();
-            pathLengths.push(len);
-          });
-
-
-          let getTotalLengthPerNode = function(d,i){
-            let totalLength = pathLengths[i];
-            return totalLength + " " + totalLength
-          }
-
-            path
-              .attr("stroke-dasharray", function(d,i){return getTotalLengthPerNode()})
-              .attr("stroke-dashoffset", totalLength)
-              .transition()
-                .duration(2000)
-                .ease("linear")
-            		.each("end", onUpdate)
-                .attr("stroke-dashoffset", 0)
-
-
-          // add the points
-
-          var point = city.append("g")
-                          .attr("class", "line-point");
-
-
-          point.selectAll('circle')
-          .data(function(d){ return d.values})
-          .enter().append('circle')
-          .on("mouseover", tip.show)
-          .on("mouseout", tip.hide)
-          .attr("cx", function(d) { return x(d.date) })
-          .attr("cy", function(d) { return y(d.value) })
-          .attr("r", 0)
-          .style("opacity", function(d){ return (d.selected) ? 1 : 0})
-          .style("fill", "white")
-          .style("stroke", function(d) { return getLineColor(d); })
-          .transition()
-            .duration(1000)
-            .delay( function(d,i){ return 250 + ( 750 * i) })
-            .attr("r", 5);
-
-          // city label
-          cityLabelContainer = city
-              .append("g")
-              .attr("class", "cityLabelContainer");
-
-          cityLabelContainer
-          	.append("text")
-          	.datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-              .attr("transform", function(d) { return "translate(" + x(d.value.date) + "," + y(d.value.value) + ")"; })
-              .attr("x", 5)
-              .attr("dy", ".35em")
-              .text(function(d) {  return d.name; });
-
-
-          reorder();
-
-        }
-
-        var getDummyData = function(){
-          /*
-
-          date  New York  San Francisco Austin
-          20161001  432 624 724
-          20161002  582 594 674
-          20161003  999 599 694
-          20161004  575 584 685
-          20161005  200 399 360
-          20161006  758 757 770
-          20161007  257 526 282
-
-        0bject
-        Austin:"724"
-        New York:"432"
-        San Francisco:"624"
-        date:"20161001"
-
-        */
-
-
-          let cityNames = ["new york","toronto","San Francisco","bangalore","tokyo"];
-          let dates = ["20161001", "20161002","20161003","20161004","20161005","20161006","20161007"];
-
-          let data = [];
-
-          dates.forEach((dateStr) => {
-
-            let dataObj = {
-              "new york" : Math.floor( Math.random() * 1500 ),
-              "toronto" : Math.floor( Math.random() * 1500 ),
-              "San Francisco" : Math.floor( Math.random() * 1500 ),
-              "bangalore" : Math.floor( Math.random() * 1500 ),
-              "tokyo" : Math.floor( Math.random() * 1500 ),
-              date: dateStr,
-            }
-
-            data.push(dataObj);
-
-          });
-
-        	//console.log(data)
-          return data;
-
-        }
-
-        var onTabLoaded = function(data){
-
-          data = tabProcessData(data);
-          createChart(data);
-
-          // make sure the selected line is on top...
-          // D3 v3 isnt easiser with jquery but v4 has better ordering
-          let selectedLineGroup = $(".lineSelected");
-          selectedLineGroup.remove();
-
-        	// add it back first
-          $('svg g').append(selectedLineGroup);
-
-
-        }
-
-
-        var dummyData = getDummyData();
-
-        onTabLoaded(dummyData);
-
-        //d3.tsv("data.tsv", onTabLoaded);
       </script>
 
       <h2>
@@ -400,14 +122,14 @@ draft: false
       <div class="diff-chart" id="diff-chart"></div>
 
       <style>
-        .axis path,
-        .diff-chart.axis line {
+        .diff-chart .axis path,
+        .diff-chart .axis line {
           fill: none;
           stroke: #000;
           shape-rendering: crispEdges;
         }
 
-        .x.axis path {
+        .diff-chart .x.axis path {
           display: none;
         }
 
@@ -419,7 +141,7 @@ draft: false
           fill: MediumPurple;
         }
 
-        .line {
+        .diff-chart .line {
           fill: none;
           stroke: #000;
           stroke-width: 1.5px;
