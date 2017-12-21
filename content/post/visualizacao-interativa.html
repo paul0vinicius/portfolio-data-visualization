@@ -15,9 +15,34 @@ draft: false
 
     <link rel="stylesheet" href="css/diff_chart.css" />
   </head>
+  <style>
+    #tooltip {
+      position: absolute;
+      width: auto;
+      height: auto;
+      padding: 10px;
+      background-color: pink;
+      border-radius: 10px;
+    }
+
+    #tooltip.hidden {
+      display: none;
+    }
+
+    #tooltip p {
+      margin: 0;
+      font-family: sans-serif;
+      font-size: 12px;
+      line-height: 20px;
+    }
+  </style>
 
   <body>
     <div class="diff-chart-interativo" id="diff-chart-interativo"></div>
+    <div id="tooltip" class="hidden">
+       <p id="titulo_tooltip"></p>
+       <p><b id="value">0</b></p>
+    </div>
     <script>
       diff_interactive_chart();
     </script>

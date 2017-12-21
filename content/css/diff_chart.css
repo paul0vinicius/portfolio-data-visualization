@@ -22,3 +22,7 @@
   stroke: #000;
   stroke-width: 1.5px;
 }
+
+.diff-chart-interativo .body {
+  color: white;
+}
