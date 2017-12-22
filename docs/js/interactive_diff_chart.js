@@ -158,8 +158,8 @@ function diff_interactive_chart(){
               .on("click", verificaGraficoExibicao);
           // area.y1(function(d) { console.log(d); return y(d["n_homens"]); });
           // area.y0(function(d) { return y(d["n_mulheres"]); });
-          pathAreaAbove.transition().duration(500).remove();
           pathAreaBelow.transition().duration(500).remove();
+          pathAreaAbove.remove();
           break;
         case "jackson":
           x.domain(d3.extent(dataFiltradoJackson, function(d) { return d.date; }));
@@ -182,7 +182,6 @@ function diff_interactive_chart(){
           // area.y1(function(d) { console.log(d); return y(d["n_homens"]); });
           // area.y0(function(d) { return y(d["n_mulheres"]); });
           pathAreaBelow.transition().duration(500).remove();
-          pathAreaAbove.transition().duration(500).remove();
           break;
         case "bobs":
           x.domain(d3.extent(dataFiltradoBobs, function(d) { return d.date; }));
@@ -205,7 +204,6 @@ function diff_interactive_chart(){
           // area.y1(function(d) { console.log(d); return y(d["n_homens"]); });
           // area.y0(function(d) { return y(d["n_mulheres"]); });
           pathAreaBelow.transition().duration(500).remove();
-          pathAreaAbove.transition().duration(500).remove();
           break;
         case "todos":
           x.domain(d3.extent(dataFiltradoTodos, function(d) { return d.date; }));
@@ -227,7 +225,6 @@ function diff_interactive_chart(){
               .on("click", verificaGraficoExibicao);
           // area.y1(function(d) { console.log(d); return y(d["n_homens"]); });
           // area.y0(function(d) { return y(d["n_mulheres"]); });
-          pathAreaAbove.transition().duration(500).remove();
           pathAreaBelow.transition().duration(500).remove();
           break;
         default:
